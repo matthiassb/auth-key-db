@@ -13,4 +13,4 @@ if [ -r "$HOMEDIR/.ssh/authorized_keys" ]; then
   cat $HOMEDIR/.ssh/authorized_keys
 fi
 
-curl -s "http://$HOST/ssh/index.php?username=$USER"
+curl -s "http://$HOST/<path to index.php>?username=$USER"
