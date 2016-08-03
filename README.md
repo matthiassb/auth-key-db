@@ -1,8 +1,8 @@
-#LDAP
+#Auth Key Portal
 
 ### Background
 
-I was architecting and standing up some infrastructure in AWS for a client who required key based login for to the EC2 nodes without using a solution like EFS. Thus I wrote this simple portal code.
+I was architecting and standing up some infrastructure in AWS for a client who required key based login for their EC2 nodes without using a solution like EFS. Thus I wrote this simple portal code.
 
 ### Info
 
@@ -27,7 +27,7 @@ FLUSH PRIVILEGES;
 
 #### Step 5 - Update config.php
 
-#### Configuring Nodes
+### Configuring Nodes
 
 1. sudo cp auth-key-command.sh /opt/auth-key-command.sh
 2. Make file executeable (sudo chmod +x /opt/auth-key-command.sh)
@@ -36,7 +36,10 @@ FLUSH PRIVILEGES;
 AuthorizedKeysCommand /opt/auth-key-command.sh
 AuthorizedKeysCommandUser root
 ```
-
+4. Restart ssh service
+```
+sudo service ssh restart
+```
 
 **Optional**
 - Add line to end of  /etc/pam.d/ssh
@@ -45,7 +48,4 @@ AuthorizedKeysCommandUser root
 session    required   pam_mkhomedir.so skel=/etc/skel/ umask=0022
 ```
 
-4. Restart ssh service
-```
-sudo service ssh restart
-```
+
