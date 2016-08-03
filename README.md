@@ -38,9 +38,10 @@ FLUSH PRIVILEGES;
   AuthorizedKeysCommandUser root
   ```
 4. Restart ssh service
-```
-sudo service ssh restart
-```
+
+  ```
+  sudo service ssh restart
+  ```
 
 **Optional**
 - Add line to end of  /etc/pam.d/ssh
