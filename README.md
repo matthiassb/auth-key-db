@@ -1,4 +1,4 @@
-#Auth Key Portal
+# Auth Key Portal
 
 ### Background
 
@@ -48,4 +48,13 @@ sudo service ssh restart
 session    required   pam_mkhomedir.so skel=/etc/skel/ umask=0022
 ```
 
+### Screenshots
 
+#### Login Page
+![Login](/screenshot-1.png)
+
+#### Dashboard Page
+![Dashboard](/screenshot-2.png)
+
+#### Add Key Dialog
+![Add Key Dialog](/screenshot-3.png)
