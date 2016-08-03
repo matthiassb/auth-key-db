@@ -32,14 +32,16 @@ FLUSH PRIVILEGES;
 1. sudo cp auth-key-command.sh /opt/auth-key-command.sh
 2. Make file executeable (sudo chmod +x /opt/auth-key-command.sh)
 3. Add the following to the end of /etc/ssh/sshd_config
-```
-AuthorizedKeysCommand /opt/auth-key-command.sh
-AuthorizedKeysCommandUser root
-```
+
+  ```
+  AuthorizedKeysCommand /opt/auth-key-command.sh
+  AuthorizedKeysCommandUser root
+  ```
 4. Restart ssh service
-```
-sudo service ssh restart
-```
+
+  ```
+  sudo service ssh restart
+  ```
 
 **Optional**
 - Add line to end of  /etc/pam.d/ssh
