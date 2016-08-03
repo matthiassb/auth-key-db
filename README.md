@@ -30,14 +30,15 @@ FLUSH PRIVILEGES;
 ### Configuring Nodes
 
 1. sudo cp auth-key-command.sh /opt/auth-key-command.sh
-2. Make file executeable (sudo chmod +x /opt/auth-key-command.sh)
-3. Add the following to the end of /etc/ssh/sshd_config
+2. Update HOST variable in auth-key-command.sh
+3. Make file executeable (sudo chmod +x /opt/auth-key-command.sh)
+4. Add the following to the end of /etc/ssh/sshd_config
 
   ```
   AuthorizedKeysCommand /opt/auth-key-command.sh
   AuthorizedKeysCommandUser root
   ```
-4. Restart ssh service
+5. Restart ssh service
 
   ```
   sudo service ssh restart
