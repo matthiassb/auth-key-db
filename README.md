@@ -4,9 +4,9 @@
 
 I was architecting and standing up some infrastructure in AWS for a client who required key based login for their EC2 nodes without using a solution like EFS. Thus I wrote this simple portal code.
 
-### Info
+### Why MySQL?
 
-This portal uses LDAP for authentication.
+AWS Simple AD Directory Services does not support schema extensions for a custom attribute to hold SSH keys. I did not want to use any existing attributes in the event they will be used later down the road.
 
 ### Setup
 #### Step 1 - Install Dependencies
