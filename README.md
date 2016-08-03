@@ -36,7 +36,7 @@ FLUSH PRIVILEGES;
 
   ```
   AuthorizedKeysCommand /opt/auth-key-command.sh
-  AuthorizedKeysCommandUser root
+  AuthorizedKeysCommandUser nobody
   ```
 5. Restart ssh service
 
