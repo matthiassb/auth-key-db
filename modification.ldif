@@ -1,0 +1,13 @@
+dn: CN=sshKeys,CN=Schema,CN=Configuration,DC=domain,DC=example
+changetype: add
+objectClass: top
+objectClass: attributeSchema
+cn: sshKeys
+attributeID: 1.2.840.113556.1.8000.2554.37018.12966.39189.18096.34375.14103118.13341910
+attributeSyntax: 2.5.5.4
+isSingleValued: FALSE
+oMSyntax: 20
+
+dn: CN=Person,CN=Schema,CN=Configuration,DC=domain,DC=example
+changetype: modify
+maycontain: sshKeys

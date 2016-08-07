@@ -1,8 +1,7 @@
 <?php
-  define (DB_USER, "<DB USERNAME>");
-  define (DB_PASSWORD, "<DB PASSWORD>");
-  define (DB_DATABASE, "ssh_config"); //leave same
-  define (DB_HOST, "<DB HOST>");
-  define (LDAP_SERVER, "<LDAP SERVER>");
-  define (LDAP_DOMAIN, "<LDAP DOMAIN>");
+  define (LDAP_SERVER, "10.1.0.143");
+  define (LDAP_DOMAIN, "example.local");
+	define (LDAP_QUERY_USER, "Administrator");
+	define (LDAP_QUERY_PASSWORD, "<password>");
+	define (LDAP_BASE_DN, "DC=example,DC=local");
 ?>

@@ -63,10 +63,12 @@ $(document).ready(function() {
         "key": inputValue,
         "action": "add-key"
       }, function(response) {
-        swal("Key Added")
-        window.setTimeout(function(){
-          window.location.reload();
-        }, 1500)
+        swal({type: response.status, text: response.message, title: ''})
+        if(response.status == "success"){
+          window.setTimeout(function(){
+            window.location.reload();
+          }, 1500)
+        }
       });
     });
 
@@ -83,13 +85,16 @@ $(document).ready(function() {
   $(".deleteKey").click(function() {
     $this = $(this);
     $.post(window.location.pathname, {
-      "id": $this.data('key-id'),
-      "action": "delete-key"
+      "key": $this.data('key'),
+      "action": "delete-key",
+      "username": $this.data('username'),
     }, function(response) {
-      swal("Key Deleted")
-      window.setTimeout(function(){
-        window.location.reload();
-      }, 1500)
+      swal({type: response.status, text: response.message, title: ''})
+      if(response.status == "success"){
+        window.setTimeout(function(){
+          window.location.reload();
+        }, 1500)
+      }
     });
   })
   // Loading
@@ -113,5 +118,18 @@ $(document).ready(function() {
     $form.find('[type=submit]').addClass('error').html(options['btn-error']);
     $form.find('.login-form-main-message').remove('success')
     $form.find('.login-form-main-message').addClass('show error').html(options['msg-error']);
+  }
+
+  // Dummy Submit Form (Remove this)
+  //----------------------------------------------
+  // This is just a dummy form submission. You should use your AJAX function or remove this function if you are not using AJAX.
+  function dummy_submit_form($form) {
+    if ($form.valid()) {
+      form_loading($form);
+
+      setTimeout(function() {
+        form_success($form);
+      }, 2000);
+    }
   }
 });

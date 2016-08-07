@@ -1,16 +1,6 @@
 <?php
   require("config.php");
   require("functions.php");
-  $db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
-
-  if($db->connect_errno > 0) {
-    die('Unable to connect to database [' . $db->connect_error . ']');
-  }
-
-  //ensure authorized_keys table exists
-  if ($db->query(createKeysTableSql()) !== TRUE) {
-    die("Error creating table...");
-  }
 
   session_start();
 
@@ -37,38 +27,102 @@
   //add key method
   if($_SERVER['REQUEST_METHOD'] == "POST" && $_POST["action"] == "add-key"){
     header('Content-Type: application/json');
-    $sql = "INSERT INTO authorized_keys (username, pub_key) VALUES(\"{$_POST['username']}\", \"{$_POST['key']}\")";
 
-    if ($db->query($sql) === TRUE) {
-      echo json_encode(array(
-        'status' => 'success',
-        'message' => 'Key Added'
-      ));
-    } else {
+    //check if key is validate
+    $path = tempnam(sys_get_temp_dir(), 'key');
+
+    $handle = fopen($path, "w");
+    fwrite($handle, $_POST['key']);
+    fclose($handle);
+
+    exec("ssh-keygen -lf {$path}", $output, $retval);
+
+    if($retval != 0){
       echo json_encode(array(
         'status' => 'error',
-        'message' => 'Error adding key'
+        'message' => 'Error adding key: invalid public key format'
       ));
+      die;
     }
+
+    //add key to ldap property
+		$ldap = ldap_connect(LDAP_SERVER);
+
+		if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
+			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_POST['username']})",array("sshKeys"));
+      $entries = ldap_get_entries($ldap, $results);
+
+      unset($entries[0]["sshkeys"]["count"]);
+
+      $entry["sshkeys"] = $_POST['key'];
+
+			$ret = ldap_mod_add($ldap, $entries[0]["dn"], $entry);
+
+      if($ret == FALSE){
+        echo json_encode(array(
+    			'status' => 'error',
+    			'message' => 'Error adding key: ' . ldap_error($ldap)
+    		));
+      } else {
+        echo json_encode(array(
+          'status' => 'success',
+          'message' => 'Key Added'
+        ));
+      }
+			die;
+		}
+		echo json_encode(array(
+			'status' => 'error',
+			'message' => 'Error adding key: LDAP BIND FAILED'
+		));
+    unlink($path);
     die;
   }
 
   //delete key method
   if($_SERVER['REQUEST_METHOD'] == "POST" && $_POST["action"] == "delete-key"){
     header('Content-Type: application/json');
-    $sql = "DELETE FROM authorized_keys WHERE id={$_POST['id']}; ";
+    $ldap = ldap_connect(LDAP_SERVER);
 
-    if ($db->query($sql) === TRUE) {
-      echo json_encode(array(
-        'status' => 'success',
-        'message' => 'Key Deleted'
-      ));
-    } else {
-      echo json_encode(array(
-        'status' => 'error',
-        'message' => 'Error deleting key'
-      ));
-    }
+    if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
+			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_POST['username']})",array("sshKeys"));
+      $entries = ldap_get_entries($ldap, $results);
+
+      $entry["sshkeys"] = $_POST['key'];
+
+			$ret = ldap_mod_del($ldap, $entries[0]["dn"], $entry);
+      if($ret == FALSE){
+        echo json_encode(array(
+    			'status' => 'error',
+    			'message' => 'Error deleting key: ' . ldap_error($ldap)
+    		));
+      } else {
+        echo json_encode(array(
+          'status' => 'success',
+          'message' => 'Key Deleted'
+        ));
+      }
+
+			die;
+		}
+    echo json_encode(array(
+			'status' => 'error',
+			'message' => 'Error delete key: LDAP BIND FAILED'
+		));
+    die;
+  }
+
+  //get list of keys in flat file format
+  if($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET['username'])){
+    $ldap = ldap_connect(LDAP_SERVER);
+    if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
+			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_GET['username']})",array("sshKeys"));
+      $entries = ldap_get_entries($ldap, $results);
+
+      unset($entries[0]["sshkeys"]["count"]);
+
+      echo implode("\n", $entries[0]["sshkeys"]);
+		}
     die;
   }
 
@@ -81,16 +135,19 @@
     die;
   }
 
-  //get list of keys in flat file format
-  if($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET['username'])){
-    if ($result = $db->query(getKeysSql($_GET['username']))){
-      while ($row = $result->fetch_assoc()){
-        echo $row["pub_key"] . "\n";
-      }
-    }
+  if(isset($_SESSION['auth']) && $_SESSION['auth'] == true){
+    $ldap = ldap_connect(LDAP_SERVER);
+    if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
+			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_SESSION['username']})",array("sshKeys"));
+      $entries = ldap_get_entries($ldap, $results);
 
-    die;
+      unset($entries[0]["sshkeys"]["count"]);
+      $keys = $entries[0]["sshkeys"];
+
+		}
   }
+
+
 ?>
 <html>
   <head>
@@ -129,7 +186,7 @@
       				<button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
       			</div>
       			<div class="etc-login-form">
-      				<p>Your Company Inc.</p>
+      				<p>My Company Inc.</p>
       			</div>
       		</form>
       	</div>
@@ -147,7 +204,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Your Company - <?php echo $_SESSION['username']; ?></a>
+            <a class="navbar-brand" href="#">My Company - <?php echo $_SESSION['username']; ?></a>
           </div>
 
           <!-- Collect the nav links, forms, and other content for toggling -->
@@ -173,23 +230,21 @@
             </tr>
           </thead>
           <tbody>
-            <?php  if ($result = $db->query(getKeysSql($_SESSION['username']))): ?>
-              <?php if($result->num_rows == 0): ?>
-                <tr>
-                  <td>No</td>
-                  <td>Keys</td>
-                </tr>
-              <?php endif; ?>
-              <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                  <td><?php echo explode(' ', $row['pub_key'])[2]; ?></td>
-                  <td>
-                    <button type="button" class="btn btn-default btn-sm viewKey" data-key='<?php echo $row['pub_key']; ?>'>View</button>&nbsp;
-                    <button type="button" class="btn btn-danger btn-sm deleteKey" data-key-id="<?php echo $row['id']; ?>">Delete</button>
-                  </td>
-                </tr>
-              <?php endwhile; ?>
+            <?php if(count($keys) <= 0): ?>
+              <tr>
+                <td>No</td>
+                <td>Keys</td>
+              </tr>
             <?php endif; ?>
+            <?php foreach ($keys as $key): ?>
+              <tr>
+                <td><?php echo explode(' ', $key)[2]; ?></td>
+                <td>
+                  <button type="button" class="btn btn-default btn-sm viewKey" data-key='<?php echo $key; ?>'>View</button>&nbsp;
+                  <button type="button" class="btn btn-danger btn-sm deleteKey" data-key='<?php echo $key; ?>' data-username="<?php echo $_SESSION['username']; ?>">Delete</button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
           </tbody>
         </table>
       </div>
