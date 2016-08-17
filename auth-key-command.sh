@@ -7,10 +7,11 @@ fi
 
 HOST=127.0.0.1
 USER=$1
+INDEX_PATH="/index.php"
 
 HOMEDIR=$(eval echo ~$USER)
 if [ -r "$HOMEDIR/.ssh/authorized_keys" ]; then
   cat $HOMEDIR/.ssh/authorized_keys
 fi
 
-curl -s "http://$HOST/<path to index.php>?username=$USER"
+curl -s "http://$HOST$INDEX_PATH?username=$USER"
