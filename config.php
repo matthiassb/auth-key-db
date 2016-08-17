@@ -1,4 +1,5 @@
 <?php
+  define (COMPANY_NAME, "My Company");
   define (LDAP_SERVER, "10.1.0.143");
   define (LDAP_DOMAIN, "example.local");
   define (LDAP_QUERY_USER, "Administrator");

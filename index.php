@@ -185,7 +185,7 @@
               <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
             </div>
             <div class="etc-login-form">
-              <p>My Company Inc.</p>
+              <p><?php echo MY_COMPANY; ?></p>
             </div>
           </form>
         </div>
@@ -203,7 +203,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">My Company - <?php echo $_SESSION['username']; ?></a>
+            <a class="navbar-brand" href="#"><?php echo MY_COMPANY; ?> - <?php echo $_SESSION['username']; ?></a>
           </div>
 
           <!-- Collect the nav links, forms, and other content for toggling -->
