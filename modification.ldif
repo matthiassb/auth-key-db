@@ -1,4 +1,4 @@
-dn: CN=sshKeys,CN=Schema,CN=Configuration,DC=domain,DC=example
+dn: CN=sshKeys,CN=Schema,CN=Configuration,DC=example,DC=local
 changetype: add
 objectClass: top
 objectClass: attributeSchema
@@ -8,6 +8,6 @@ attributeSyntax: 2.5.5.4
 isSingleValued: FALSE
 oMSyntax: 20
 
-dn: CN=Person,CN=Schema,CN=Configuration,DC=domain,DC=example
+dn: CN=Person,CN=Schema,CN=Configuration,DC=example,DC=local
 changetype: modify
 maycontain: sshKeys

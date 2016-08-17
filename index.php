@@ -1,6 +1,5 @@
 <?php
   require("config.php");
-  require("functions.php");
 
   session_start();
 
@@ -46,35 +45,35 @@
     }
 
     //add key to ldap property
-		$ldap = ldap_connect(LDAP_SERVER);
+    $ldap = ldap_connect(LDAP_SERVER);
 
-		if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
-			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_POST['username']})",array("sshKeys"));
+    if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
+      $results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_POST['username']})",array("sshKeys"));
       $entries = ldap_get_entries($ldap, $results);
 
       unset($entries[0]["sshkeys"]["count"]);
 
       $entry["sshkeys"] = $_POST['key'];
 
-			$ret = ldap_mod_add($ldap, $entries[0]["dn"], $entry);
+      $ret = ldap_mod_add($ldap, $entries[0]["dn"], $entry);
 
       if($ret == FALSE){
         echo json_encode(array(
-    			'status' => 'error',
-    			'message' => 'Error adding key: ' . ldap_error($ldap)
-    		));
+          'status' => 'error',
+          'message' => 'Error adding key: ' . ldap_error($ldap)
+        ));
       } else {
         echo json_encode(array(
           'status' => 'success',
           'message' => 'Key Added'
         ));
       }
-			die;
-		}
-		echo json_encode(array(
-			'status' => 'error',
-			'message' => 'Error adding key: LDAP BIND FAILED'
-		));
+      die;
+    }
+    echo json_encode(array(
+      'status' => 'error',
+      'message' => 'Error adding key: LDAP BIND FAILED'
+    ));
     unlink($path);
     die;
   }
@@ -85,17 +84,17 @@
     $ldap = ldap_connect(LDAP_SERVER);
 
     if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
-			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_POST['username']})",array("sshKeys"));
+      $results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_POST['username']})",array("sshKeys"));
       $entries = ldap_get_entries($ldap, $results);
 
       $entry["sshkeys"] = $_POST['key'];
 
-			$ret = ldap_mod_del($ldap, $entries[0]["dn"], $entry);
+      $ret = ldap_mod_del($ldap, $entries[0]["dn"], $entry);
       if($ret == FALSE){
         echo json_encode(array(
-    			'status' => 'error',
-    			'message' => 'Error deleting key: ' . ldap_error($ldap)
-    		));
+          'status' => 'error',
+          'message' => 'Error deleting key: ' . ldap_error($ldap)
+        ));
       } else {
         echo json_encode(array(
           'status' => 'success',
@@ -103,12 +102,12 @@
         ));
       }
 
-			die;
-		}
+      die;
+    }
     echo json_encode(array(
-			'status' => 'error',
-			'message' => 'Error delete key: LDAP BIND FAILED'
-		));
+      'status' => 'error',
+      'message' => 'Error delete key: LDAP BIND FAILED'
+    ));
     die;
   }
 
@@ -116,13 +115,13 @@
   if($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET['username'])){
     $ldap = ldap_connect(LDAP_SERVER);
     if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
-			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_GET['username']})",array("sshKeys"));
+      $results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_GET['username']})",array("sshKeys"));
       $entries = ldap_get_entries($ldap, $results);
 
       unset($entries[0]["sshkeys"]["count"]);
 
       echo implode("\n", $entries[0]["sshkeys"]);
-		}
+  }
     die;
   }
 
@@ -138,13 +137,13 @@
   if(isset($_SESSION['auth']) && $_SESSION['auth'] == true){
     $ldap = ldap_connect(LDAP_SERVER);
     if ($bind = ldap_bind($ldap, LDAP_QUERY_USER . '@' . LDAP_DOMAIN, LDAP_QUERY_PASSWORD)) {
-			$results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_SESSION['username']})",array("sshKeys"));
+      $results = ldap_search($ldap, LDAP_BASE_DN, "(samaccountname={$_SESSION['username']})",array("sshKeys"));
       $entries = ldap_get_entries($ldap, $results);
 
       unset($entries[0]["sshkeys"]["count"]);
       $keys = $entries[0]["sshkeys"];
 
-		}
+    }
   }
 
 
@@ -167,29 +166,29 @@
   <body>
     <?php if(!isset($_SESSION['auth'])): ?>
       <div class="text-center" style="padding:50px 0">
-      	<div class="logo">Login</div>
-      	<div class="login-form-1">
-      		<form id="login-form" class="text-left">
-      			<div class="login-form-main-message"></div>
-      			<div class="main-login-form">
-      				<div class="login-group">
-      					<div class="form-group">
-      						<label for="username" class="sr-only">Username</label>
-      						<input type="text" class="form-control" id="username" name="username" placeholder="username">
-      					</div>
-      					<div class="form-group">
-      						<label for="password" class="sr-only">Password</label>
-      						<input type="password" class="form-control" id="password" name="password" placeholder="password">
-      					</div>
+        <div class="logo">Login</div>
+        <div class="login-form-1">
+          <form id="login-form" class="text-left">
+            <div class="login-form-main-message"></div>
+            <div class="main-login-form">
+              <div class="login-group">
+                <div class="form-group">
+                  <label for="username" class="sr-only">Username</label>
+                  <input type="text" class="form-control" id="username" name="username" placeholder="username">
+                </div>
+                <div class="form-group">
+                  <label for="password" class="sr-only">Password</label>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="password">
+                </div>
                 <input type="hidden" name="action" value="login">
-      				</div>
-      				<button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
-      			</div>
-      			<div class="etc-login-form">
-      				<p>My Company Inc.</p>
-      			</div>
-      		</form>
-      	</div>
+              </div>
+              <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
+            </div>
+            <div class="etc-login-form">
+              <p>My Company Inc.</p>
+            </div>
+          </form>
+        </div>
       </div>
     <?php endif; ?>
 
